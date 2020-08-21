@@ -59,6 +59,7 @@ https://theposhwolf.com/howtos/Get-LoginEvents/?fbclid=IwAR3HkPNZ2M3Ujrvjr0ryu5u
 # END DEFINE PARAMETERS ------------------------------------------
 # DEFINE VARIABLES -----------------------------------------------
 
+$ExcludedComputerAccounts = "DWM-1","LOCAL SERVICE","NETWORK SERVICE","SYSTEM"
 $filterHt = @{LogName = 'Security';ID = 4624}
 $Results = @()
 
@@ -95,7 +96,7 @@ If($PSBoundParameters.ContainsKey('TargetUsername'))
 ElseIf($ExcludeComputerAccounts -eq $True)
 {
     Write-Verbose "Removing computer and SYSTEM accounts from the results..."
-    $LogonEvents = $LogonEvents | Where-Object{$_.Properties.Value[5] -NotLike '*$*' -and $_.Properties.Value[5] -ne 'SYSTEM'}
+    $LogonEvents = $LogonEvents | Where-Object{$_.Properties.Value[5] -NotLike '*$*' -and $_.Properties.Value[5] -NotIn $ExcludedComputerAccounts}
     Write-Verbose "$($LogonEvents.Count) events remain after filtering"
 }
 
