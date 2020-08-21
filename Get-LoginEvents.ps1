@@ -57,22 +57,6 @@ https://theposhwolf.com/howtos/Get-LoginEvents/?fbclid=IwAR3HkPNZ2M3Ujrvjr0ryu5u
             [string] $TargetUsername
     )
 # END DEFINE PARAMETERS ------------------------------------------
-# DEFINE CLASSES -------------------------------------------------
-
-enum LogonTypes
-{
-    Interactive = 2
-    Network = 3
-    Batch = 4
-    Service = 5
-    Unlock = 7
-    NetworkClearText = 8
-    NewCredentials = 9
-    RemoteInteractive = 10
-    CachedInteractive = 11
-}
-
-# END DEFINE CLASSES ---------------------------------------------
 # DEFINE VARIABLES -----------------------------------------------
 
 $filterHt = @{LogName = 'Security';ID = 4624}
@@ -124,7 +108,18 @@ ForEach($Event in $LogonEvents)
         TimeStamp = $Event.TimeCreated
         UserDomain = $Event.Properties.Value[6]
         Username = $Event.Properties.Value[5]
-        LogonType = [LogonTypes]$Event.Properties.Value[8]
+        LogonType = Switch($Event.Properties.Value[8])
+                    {
+                        2 {"Interactive"}
+                        3 {"Network"}
+                        4 {"Batch"}
+                        5 {"Service"}
+                        7 {"Unlock"}
+                        8 {"NetworkClearText"}
+                        9 {"NewCredentials"}
+                        10 {"RemoteInteractive"}
+                        11 {"CachedInteractive"}
+                    }
         ComputerIPAddress = $Event.Properties.Value[18]
         ComputerName = $Event.Properties.Value[11]
         }
